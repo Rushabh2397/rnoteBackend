@@ -1,4 +1,4 @@
-
+import User from '../models/user'
 
 module.exports = (req,res,next)=>{
     if(!req.user || (!req.user && !req.user._id)){

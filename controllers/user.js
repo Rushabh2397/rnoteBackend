@@ -10,7 +10,7 @@ module.exports = {
      * Api to register user
      * @param {email,password} req
     */
-    register = (req, res) => {
+    register : (req, res) => {
         async.waterfall([
             (nextCall) => {
                 if (!req.body.email || !req.body.password) {
@@ -71,47 +71,6 @@ module.exports = {
         })
     },
     
-    /**
-     * Api to check whether user exist or not.
-     * @param {email} req  
-    */
-    checkUserExist: (req, res) => {
-        async.waterfall([
-            (nextCall) => {
-                if (!req.body.email) {
-                    return nextCall({
-                        message: 'Email is required.'
-                    })
-                }
-                nextCall(null, body)
-            },
-            (body, nextCall) => {
-                User.findOne({ email: body.email }, (err, user) => {
-                    if (err) {
-                        return nextCall(err)
-                    } else if (user) {
-                        nextCall(null, null)
-                    } else {
-                        nextCall({
-                            message: "User doesn't exist."
-                        })
-                    }
-                })
-            }
-        ], (err, response) => {
-            if (err) {
-                return res.status(400).json({
-                    message: (err && err.message) || 'Oops! Something went wrong.'
-                })
-            }
-
-            res.json({
-                status: 'success',
-                message: 'User exist.'
-            })
-
-        })
-    },
     
     /**
      * Api to login user.
@@ -137,7 +96,7 @@ module.exports = {
                             nextCall(null, user)
                         } else {
                             nextCall({
-                                message: 'Please check your password.'
+                                message: 'Please check your email/password.'
                             })
                         }
                     } else {

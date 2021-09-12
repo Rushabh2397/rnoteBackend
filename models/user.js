@@ -4,6 +4,9 @@ import { encrypt } from '../utils/encryDecry'
 
 
 const userSchema = new Schema({
+    name: {
+        type: String
+    },
     email: {
         type: String
     },

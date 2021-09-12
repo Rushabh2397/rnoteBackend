@@ -1,5 +1,6 @@
 import Note from '../models/note'
 import async from 'async'
+import  mongoose from 'mongoose'
 
 
 
@@ -24,7 +25,9 @@ module.exports = {
                     user_id: req.user._id,
                     title: body.title,
                     note: body.note,
-                    color: body.color
+                    color: body.color,
+                    is_archived : body.is_archived,
+                    is_pinned : body.is_pinned
                 })
                 newNote.save((err, note) => {
                     if (err) {
@@ -54,7 +57,7 @@ module.exports = {
     updateNote: (req, res) => {
         async.waterfall([
             (nextCall) => {
-                Note.findOne({ user_id: req.user._id }, (err, note) => {
+                Note.findById({ _id: req.body.note_id }, (err, note) => {
                     if (err) {
                         nextCall(err)
                     } else if (note) {
@@ -73,9 +76,9 @@ module.exports = {
                         title: body.title ? body.title : note.title,
                         note: body.note ? body.note : note.note,
                         color: body.color ? body.color : note.color,
-                        is_active: body.is_active ? body.is_active : note.is_active,
-                        is_pinned: body.is_pinned ? body.is_pinned : note.is_pinned,
-                        is_archived: body.is_archived ? body.is_archived : note.is_archived
+                        is_active: (body.is_active===0 || body.is_active===1) ? body.is_active : note.is_active,
+                        is_pinned: (body.is_pinned===0 || body.is_archived===1) ? body.is_pinned : note.is_pinned,
+                        is_archived: (body.is_archived===0  || body.is_archived===1) ? body.is_archived : note.is_archived
                     },
                     { new: true },
                     (err, updatedNote) => {
@@ -106,13 +109,22 @@ module.exports = {
      * @param {field,value,search} req  
     */
     getAllNotes: (req, res) => {
+        console.log("body",req.body)
         async.waterfall([
             (nextCall) => {
                 let aggregateQuery = [];
-
+                let query = {}
+                query.user_id = mongoose.Types.ObjectId(req.user._id);
+                if(req.body.isActive===0 || req.body.is_active===1){
+                    query.is_active = req.body.isActive    
+                }
+                query.is_active = req.body.isActive
+                if(req.body.isArchived===1 || req.body.isArchived===0){
+                    query.is_archived =  req.body.isArchived
+                }  
                 aggregateQuery.push({
                     $match: {
-                        [req.body.field]: req.body.value
+                        $and:[query]
                     }
                 })
 
@@ -120,13 +132,13 @@ module.exports = {
                     let regex = new RegExp(req.body.search, 'i');
                     let search = {
                         $or: [
-                            { title: regex },
-                            { color: regex }
+                            {'title': regex },
+                            { 'color': regex }
                         ]
                     }
-
+                    console.log("search",search)
                     aggregateQuery.push({
-                        $match: search
+                        '$match': search
                     })
                 }
 
@@ -146,13 +158,14 @@ module.exports = {
                                 "color": "$color",
                                 "is_pinned": "$is_pinned",
                                 "is_archived": "$is_archived",
-                                "is_active": "$is_active"
+                                "is_active": "$is_active",
+                                "updated_at":"$updated_at"
                             }
                         }
                     }
                 })
-
-                Note.aggrgate(aggregateQuery).exec((err, noteList) => {
+                console.log("aggregate",aggregateQuery[1])
+                Note.aggregate(aggregateQuery).exec((err, noteList) => {
                     if (err) {
                         return nextCall(err)
                     }
