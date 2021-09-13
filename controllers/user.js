@@ -15,7 +15,7 @@ module.exports = {
             (nextCall) => {
                 if (!req.body.email || !req.body.password) {
                     return nextCall({
-                        message: 'Please provide all parameters.'
+                        message: 'All fields are compulsory.'
                     })
                 }
                 nextCall(null, req.body)
@@ -81,7 +81,7 @@ module.exports = {
             (nextCall) => {
                 if (!req.body.email || !req.body.password) {
                     return nextCall({
-                        message: 'Please provide all parameter.'
+                        message: 'All fields are compulsory.'
                     })
                 }
                 nextCall(null, req.body)

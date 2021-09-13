@@ -109,7 +109,6 @@ module.exports = {
      * @param {field,value,search} req  
     */
     getAllNotes: (req, res) => {
-        console.log("body",req.body)
         async.waterfall([
             (nextCall) => {
                 let aggregateQuery = [];
@@ -136,7 +135,6 @@ module.exports = {
                             { 'color': regex }
                         ]
                     }
-                    console.log("search",search)
                     aggregateQuery.push({
                         '$match': search
                     })
@@ -164,13 +162,21 @@ module.exports = {
                         }
                     }
                 })
-                console.log("aggregate",aggregateQuery[1])
                 Note.aggregate(aggregateQuery).exec((err, noteList) => {
                     if (err) {
                         return nextCall(err)
                     }
                     noteList = noteList.length > 0 ? noteList[0] : { noteCount: 0, notes: [] }
                     nextCall(null, noteList)
+                })
+            },
+            (noteList,nextCall)=>{
+                Note.find({},(err,notes)=>{
+                    if(err){
+                        return nextCall(err)
+                    }
+                    noteList.totalNotes = notes.length
+                    nextCall(null,noteList)
                 })
             }
         ], (err, response) => {
@@ -219,7 +225,7 @@ module.exports = {
 
             res.json({
                 status :'success',
-                message : 'Note deleted successfully.'
+                message : 'Note deleted permanently.'
             })
         })
     }
