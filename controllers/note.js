@@ -77,7 +77,7 @@ module.exports = {
                         note: body.note ? body.note : note.note,
                         color: body.color ? body.color : note.color,
                         is_active: (body.is_active===0 || body.is_active===1) ? body.is_active : note.is_active,
-                        is_pinned: (body.is_pinned===0 || body.is_archived===1) ? body.is_pinned : note.is_pinned,
+                        is_pinned: (body.is_pinned===0 || body.is_pinned===1) ? body.is_pinned : note.is_pinned,
                         is_archived: (body.is_archived===0  || body.is_archived===1) ? body.is_archived : note.is_archived
                     },
                     { new: true },
