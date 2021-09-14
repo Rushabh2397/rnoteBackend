@@ -15,7 +15,7 @@ module.exports = {
             (nextCall) => {
                 if (!req.body.title || !req.body.note) {
                     return nextCall({
-                        message: 'Title/Note is required.'
+                        message: 'Note is required.'
                     })
                 }
                 nextCall(null, req.body)
