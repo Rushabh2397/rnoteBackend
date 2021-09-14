@@ -171,7 +171,7 @@ module.exports = {
                 })
             },
             (noteList,nextCall)=>{
-                Note.find({},(err,notes)=>{
+                Note.find({user_id:req.user._id},(err,notes)=>{
                     if(err){
                         return nextCall(err)
                     }
